@@ -3,11 +3,11 @@
 ## Files
 
 My project includes the following files:
-* model.py.ipynb **This is a jupyter notebook** At the end of the notebook.
-* drive.py 
-* model.h5 
-* writeup_report.md 
-* video.mp4
+* model.py.ipynb **This is a jupyter notebook** 
+* drive.py
+* model.h5 -- the trained model
+* writeup_report.md -- the project summary
+* video.mp4 -- a captured video
 
 ## Submission
 
@@ -26,15 +26,15 @@ https://medium.com/@tempflip/how-robotic-cars-see-the-world-6af0808451fa#.ub60oe
 
 ## Training data
 
-I'm not using the data provided by udacity, but collected it myself. The reaseon for doing this I wanted to see the difference between trainig on different about and quality of data. I'm both using track 1 and track 2 data.
+I'm not using the data provided by udacity, but collected it myself. The reason for doing this that I wanted to see the difference between trainig on different amount and quality data. I'm both using track 1 and track 2 data.
 
 I'm loading all the data into a pandas DataFrame. I'm throwing away the points which has a steering angle less than +-0.2 . The reason for this that the points which has a 0 steering angle can't improve the model at all; and I've noticed that when I train only on relatively higher steering angles, I get better results. 
 
 ## The generator
 
 I'm using a generator function for loading the images, as I wanted to create a scaleble way to load images into the memory.
-The generator does one pre-processing steps:
-It returns for every image 2 image: the original image and a left/righ flipped image with a negative steering angle. It helps to normalize the amount of left/right turns in the training dataset.
+The generator does one pre-processing step:
+It returns for every image 2 image: the original image and a left/righ flipped image with a negative steering angle. It helps to normalize the number of left/right turns in the training dataset.
 
 ## Model Architecture
 
@@ -73,27 +73,27 @@ model.add(Dense(10))
 model.add(Dense(1))
 ```
 
-I'm starting with some pre-processing steps (cropping, normalizing and reducing palette.) I've noticed that if I reduce palette my model gets better results -- this is probably because it creates a more generic understanding of the input image. Also, a smaller croppend window looks better that a larger one.
+I'm starting with some pre-processing steps (cropping, normalizing and reducing palette.) I've noticed that if I reduce palette my model gets better results -- this is probably because it creates a more generic understanding of the input image. Also, a smaller window (the cropping step) looks better than a larger one.
 
-After pre-processing I'm adding to convolutional layers, both with 3x3 windows, a 2x2 pooling layers and a RELU activation function.
+After pre-processing I'm adding to convolutional layers, both with 3x3 windows, a 2x2 pooling layer and a RELU activation function.
 Please see my reflections about the inside data here:
 
 https://medium.com/@tempflip/how-robotic-cars-see-the-world-6af0808451fa#.ub60oe7er
 
-After the convolutinal layers I'm adding 2 fully connected layers, and the final result is a 1x1 matric (the steering angle.)
+After the convolutinal layers I'm adding 2 fully connected layers, and the final result is a 1x1 matrix (the steering angle.)
 
-I've tryed to add more convolutional layers, but they did not improve the performance -- it looks like after 2 convolutions the network can get enough data to create a generic understanding of the camere positions compared to the road edges.
+I've tryed to add more convolutional layers, but they did not improve the performance -- it looks like after 2 convolutions the network can get enough data to create a generic understanding of the camera position compared to the road edges.
 
 Also, adding more fully connected layers did not improve much the performance.
 
 ## Training Strategy
 
-I'm using the 'adam' optimizer, and the loss if an MSE. I'm running the optimizer for 10 epochs, 10.000 samples in every epoch.
+I'm using the 'adam' optimizer; the loss function is a MSE. I'm running the optimizer for 10 epochs, 10.000 samples in every epoch.
 I'm saving the model into a file (model.m5, included in the repo) which can be read by the drive.py script.
 
 ## Layer visualizations
 
-In order to visualise the network I need to rebuild it in a slightly different form -- in order to do update in the weights I can't have Dropout layers, so I'm getting rid of them. After rebuilding the network, I am setting the weights of trained layers of my original network:
+In order to visualise the network I need to rebuild it in a slightly different form -- in order to update the weights I can't have Dropout layers, so I'm getting rid of them. After rebuilding the network, I am setting the weights from the trained layers of my original network:
 
 ```
 vis_model.layers[3].set_weights(layer_dict['conv1'].get_weights())
@@ -120,6 +120,7 @@ _pr = get_middle_predict(vis_model, 'start', 'conv1', _img)
 
 `get_middle_model` creates a new Model instance using the passed Model with the given input and output layers.
 `get_middle_predict` is a wrapper for getting the predictions for data using the given input/output layers.
+See the last line as an example: it gets predictions for `_img` input data using `vis_model`, starting from `start` layer and ending at `conv1` layer.
 
 Using these techniques I can visualize the states of the input layers for any input. For more details, please see this post:
 
