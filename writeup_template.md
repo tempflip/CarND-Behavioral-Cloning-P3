@@ -121,7 +121,7 @@ _pr = get_middle_predict(vis_model, 'start', 'conv1', _img)
 `get_middle_model` creates a new Model instance using the passed Model with the given input and output layers.
 `get_middle_predict` is a wrapper for getting the predictions for data using the given input/output layers.
 
-See the last line as an example: it gets middle layer output (prediction) for `_img` input data using `vis_model`, starting from `start` layer and ending at `conv1` layer.
+See the last line as an example: it returns middle layer output (prediction) for `_img` input data using `vis_model`, starting from `start` layer and ending at `conv1` layer.
 
 Using these techniques I can visualize the states of the input layers for any input. For more details, please see this post:
 
@@ -135,7 +135,7 @@ https://medium.com/@tempflip/how-robotic-cars-see-the-world-6af0808451fa#.ub60oe
 
 ![1st act](./viz/relu1.png)
 
-### 2st convolutional layer:
+### 2nd convolutional layer:
 
 ![2st conv](./viz/conv2.png)
 
