@@ -28,7 +28,13 @@ https://medium.com/@tempflip/how-robotic-cars-see-the-world-6af0808451fa#.ub60oe
 
 I'm not using the data provided by udacity, but collected it myself. The reaseon for doing this I wanted to see the difference between trainig on different about and quality of data. I'm both using track 1 and track 2 data.
 
-I'm loading all the data into a pandas DataFrame. I'm throwing away the points which has a steering angle less than +-0.2 . The reason for this that the points which has a 0 steering angle can't improve the model at all; and I've noticed that if I train only on relatively higher steering angles, I can better results. I'm using a generator function for loading the images, as I wanted to create a scaleble way to load images into the memory.
+I'm loading all the data into a pandas DataFrame. I'm throwing away the points which has a steering angle less than +-0.2 . The reason for this that the points which has a 0 steering angle can't improve the model at all; and I've noticed that when I train only on relatively higher steering angles, I get better results. 
+
+## The generator
+
+I'm using a generator function for loading the images, as I wanted to create a scaleble way to load images into the memory.
+The generator does one pre-processing steps:
+It returns for every image 2 image: the original image and a left/righ flipped image with a negative steering angle. It helps to normalize the amount of left/right turns in the training dataset.
 
 ## Model Architecture
 
@@ -82,5 +88,45 @@ Also, adding more fully connected layers did not improve much the performance.
 
 ## Training Strategy
 
+I'm using the 'adam' optimizer, and the loss if an MSE. I'm running the optimizer for 10 epochs, 10.000 samples in every epoch.
+I'm saving the model into a file (model.m5, included in the repo) which can be read by the drive.py script.
+
 ## Layer visualizations
+
+In order to visualise the network I need to rebuild it in a slightly different form -- in order to do update in the weights I can't have Dropout layers, so I'm getting rid of them. After rebuilding the network, I am setting to it's layers the trained layers from my original network:
+
+```
+vis_model.layers[3].set_weights(layer_dict['conv1'].get_weights())
+vis_model.layers[4].set_weights(layer_dict['maxpooling2d_29'].get_weights())
+vis_model.layers[5].set_weights(layer_dict['relu1'].get_weights())
+vis_model.layers[6].set_weights(layer_dict['conv2'].get_weights())
+etc
+etc
+```
+
+
+I've created 2 helper functions in order to get the  data from the network's middle layers:
+
+```
+def get_middle_model(m, i, o):
+    d = dict([(l.name, l) for l in m.layers] )
+    return Model(input = d.get(i).input, output = d.get(o).output)
+
+def get_middle_predict(m, i, o, inp_data):
+    return get_middle_model(m, i, o).predict(inp_data)
+
+_pr = get_middle_predict(vis_model, 'start', 'conv1', _img)
+```
+
+`get_middle_model` creates a new Model instance using the passed Model with the given input and output layers.
+`get_middle_predict` is a wrapper for getting the predictions for data using the given input/output layers.
+
+Using these techniques I can visualize the states of the input layers for any input. For more details, please see this post:
+https://medium.com/@tempflip/how-robotic-cars-see-the-world-6af0808451fa#.ub60oe7er
+
+1st convolutional layer:
+
+[1st conv](./viz/conv1.png)
+
+
 
