@@ -93,7 +93,7 @@ I'm saving the model into a file (model.m5, included in the repo) which can be r
 
 ## Layer visualizations
 
-In order to visualise the network I need to rebuild it in a slightly different form -- in order to do update in the weights I can't have Dropout layers, so I'm getting rid of them. After rebuilding the network, I am setting to it's layers the trained layers from my original network:
+In order to visualise the network I need to rebuild it in a slightly different form -- in order to do update in the weights I can't have Dropout layers, so I'm getting rid of them. After rebuilding the network, I am setting the weights of trained layers of my original network:
 
 ```
 vis_model.layers[3].set_weights(layer_dict['conv1'].get_weights())
@@ -122,11 +122,22 @@ _pr = get_middle_predict(vis_model, 'start', 'conv1', _img)
 `get_middle_predict` is a wrapper for getting the predictions for data using the given input/output layers.
 
 Using these techniques I can visualize the states of the input layers for any input. For more details, please see this post:
+
 https://medium.com/@tempflip/how-robotic-cars-see-the-world-6af0808451fa#.ub60oe7er
 
-1st convolutional layer:
+### 1st convolutional layer:
 
-[1st conv](./viz/conv1.png)
+![1st conv](./viz/conv1.png)
 
+### 1st activation layer:
+
+![1st act](./viz/relu1.png)
+
+### 2st convolutional layer:
+
+![2st conv](./viz/conv2.png)
+
+### 1st fully connected layer (2dim reshape)
+![1st fill](./viz/fully1.png)
 
 
